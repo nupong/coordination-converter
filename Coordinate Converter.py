@@ -12,29 +12,52 @@ from tkinter import messagebox
 # ----------------------my function----------------
 
 def convertButton():
-    latDeg = int(entryLat1.get())
-    latMin = int(entryLat2.get())
-    latSec = float(entryLat3.get())
-    latDir = comboLat1.get()
-    longDeg = int(entryLong1.get())
-    longMin = int(entryLong2.get())
-    longSec = float(entryLong3.get())
-    longDir = comboLong1.get()
+    entryOutputLat.delete(0,END)
+    entryOutputLong.delete(0,END)
+    try:
+        lat_DMS_str = lat_DMS.get()
+        long_DMS_str = long_DMS.get()
+        if len(lat_DMS_str) == 0 or len(long_DMS_str) == 0:
+            latDeg = float(entryLat1.get())
+            latMin = float(entryLat2.get())
+            latSec = float(entryLat3.get())
+            latDir = comboLat1.get()
+            longDeg = float(entryLong1.get())
+            longMin = float(entryLong2.get())
+            longSec = float(entryLong3.get())
+            longDir = comboLong1.get()
+        else:
+            latDeg = float(lat_DMS_str.split('°')[0])
+            latMin = float(lat_DMS_str.split('°')[1].split('\'')[0])
+            latSec = float(lat_DMS_str.split('°')[1].split('\'')[1].split('\"')[0])
+            latDir = lat_DMS_str[-1]
+            longDeg = float(long_DMS_str.split('°')[0])
+            longMin = float(long_DMS_str.split('°')[1].split('\'')[0])
+            longSec = float(long_DMS_str.split('°')[1].split('\'')[1].split('\"')[0])
+            longDir = long_DMS_str[-1]
+        if latDir == 'N':
+            multiplierLat = 1
+        elif latDir == 'S':
+            multiplierLat = -1
+        else:
+            messagebox.showwarning("Warning", "Bad Direction")
+            return
+        if longDir == 'E':
+            multiplierLong = 1
+        elif longDir == 'W':
+            multiplierLong = -1
+        else:
+            messagebox.showwarning("Warning", "Bad Direction")
+            return
+        newLat = round((latDeg + latMin/60 + latSec/3600)*multiplierLat,5)
+        newLong = round((longDeg + longMin/60 + longSec/3600)*multiplierLong,5)
 
-    if latDir == "N":
-        multiplierLat = 1
-    else:
-        multiplierLat = -1
-    if longDir == "E":
-        multiplierLong = 1
-    else:
-        multiplierLong = -1
-
-    newLat = round((latDeg + latMin/60 + latSec/3600)*multiplierLat,5)
-    newLong = round((longDeg + longMin/60 + longSec/3600)*multiplierLong,5)
- 
-    entryOutputLat.insert(0, newLat)
-    entryOutputLong.insert(0, newLong)
+        entryOutputLat.insert(0, newLat)
+        entryOutputLong.insert(0, newLong)
+    except ValueError:
+        messagebox.showerror("Error Handling", "Please enter the valid values")
+    except TypeError:
+        messagebox.showerror("Error Handling", "Something goes wrong")
 
 # -------------------------variables-----------------
 
@@ -53,9 +76,13 @@ input_info_frame.grid(row = 0, column = 0, padx=20, pady=10)
 
 lat_label = Label(input_info_frame, text = "Latitude DMS")
 lat_label.grid(row = 0,column = 0)
+lat_DMS = Entry(input_info_frame)
+lat_DMS.grid(row=0, column =1)
 
 long_label = Label(input_info_frame, text = "Longitude DMS")
 long_label.grid(row = 3,column = 0)
+long_DMS = Entry(input_info_frame)
+long_DMS.grid(row=3, column =1)
 
 labelLat1 = Label(input_info_frame, text = "Degrees")
 labelLat1.grid(row=1, column = 1)
